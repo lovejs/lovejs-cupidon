@@ -50,10 +50,12 @@ class LoveExtensionComponent extends React.Component {
             usage: {},
             data: {
                 love: {},
+                env: [],
                 services: [],
                 plugins: []
             },
-            search_service
+            search_service,
+            search_env: ""
         };
     }
 
@@ -82,12 +84,25 @@ class LoveExtensionComponent extends React.Component {
         this.setState({ search_service: event.target.value });
     };
 
+    handleSearchEnv = event => {
+        this.setState({ search_env: event.target.value });
+    };
+
     handleChangePanel = (event, panel) => {
         this.setState({ panel });
     };
 
     handleChangePanelIndex = index => {
         this.setState({ panel: index });
+    };
+
+    envMatch = env => {
+        if (!this.state.search_env) {
+            return true;
+        }
+        let search = this.state.search_env.toLowerCase().trim();
+
+        return env.key.toLowerCase().indexOf(search) != -1;
     };
 
     serviceMatch = service => {
@@ -107,10 +122,11 @@ class LoveExtensionComponent extends React.Component {
     render() {
         const { classes } = this.props;
         const {
-            data: { love, services, plugins },
+            data: { love, env, services, plugins },
             usage,
             panel,
-            search_service
+            search_service,
+            search_env
         } = this.state;
 
         const mb = mb => `${Math.round(mb / 1024 / 1024, 2)} MB`;
@@ -182,10 +198,29 @@ class LoveExtensionComponent extends React.Component {
                 <Grid item md={8}>
                     <Panel title="Services" color="purple">
                         <Tabs value={panel} onChange={this.handleChangePanel} indicatorColor="primary" textColor="primary" fullWidth>
+                            <Tab label="Environment" />
                             <Tab label="Services" />
-                            <Tab label="Something else" />
                         </Tabs>
                         <SwipeableViews axis="x" index={panel} onChangeIndex={this.handleChangePanelIndex}>
+                            <div style={{ padding: 8 * 3 }}>
+                                <TextField label="Search env..." onChange={this.handleSearchEnv} defaultValue={search_env} />
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Key</TableCell>
+                                            <TableCell>Value</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {env.filter(env => this.envMatch(env)).map(({ key, value }) => (
+                                            <TableRow key={key}>
+                                                <TableCell>{key}</TableCell>
+                                                <TableCell>{JSON.stringify(value)}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
                             <div style={{ padding: 8 * 3 }}>
                                 <TextField label="Search service..." onChange={this.handleSearchService} defaultValue={search_service} />
                                 <Table>
@@ -212,7 +247,6 @@ class LoveExtensionComponent extends React.Component {
                                     </TableBody>
                                 </Table>
                             </div>
-                            <div style={{ padding: 8 * 3 }}>More stuff</div>
                         </SwipeableViews>
                     </Panel>
                 </Grid>

@@ -1,7 +1,5 @@
 const path = require("path");
 const _ = require("lodash");
-const shortid = require("shortid");
-const { errorToJSON } = require("json-error");
 const CupidonExtension = require("../CupidonExtension");
 
 class CupidonLove extends CupidonExtension {
@@ -34,6 +32,10 @@ class CupidonLove extends CupidonExtension {
         return {
             version: this.kernel.getVersion()
         };
+    }
+
+    getEnv() {
+        return _.orderBy(_.map(this.kernel.getEnv(), (value, key) => ({ key, value })), "key");
     }
 
     getServices() {
@@ -70,20 +72,24 @@ class CupidonLove extends CupidonExtension {
                 tags
             };
         });
-        const instances = this.container.getInstancesNames().map(id => ({id, type: "instance", from: "", tags: []}));
- 
+        const instances = this.container.getInstancesNames().map(id => ({ id, type: "instance", from: "", tags: [] }));
+
         return _.sortBy([...services, ...instances], "id");
     }
 
     getPlugins() {
-        return _.orderBy(this.kernel.getPlugins().map(plugin => ({
-            name: plugin.name
-        })), 'name');
+        return _.orderBy(
+            this.kernel.getPlugins().map(plugin => ({
+                name: plugin.name
+            })),
+            "name"
+        );
     }
 
     async getData(query) {
         return {
             love: this.getLove(),
+            env: this.getEnv(),
             services: this.getServices(),
             plugins: this.getPlugins()
         };
