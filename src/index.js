@@ -3,7 +3,7 @@ const { Plugin } = require("@lovejs/framework");
 class CupidonPlugin extends Plugin {
     async registerServices(container, origin) {
         container.setParameter("cache.configuration", this.get());
-        await container.loadDefinitions(__dirname + "/_framework/services/cupidon.yml", origin);
+        await container.loadDefinitions(__dirname + "/_framework/services/services.yml", origin);
     }
 
     async boot(container, logger, isCli) {
