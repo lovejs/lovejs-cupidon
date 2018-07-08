@@ -4,8 +4,6 @@ const fs = require("fs");
 const sender = require("koa-send");
 const builder = require("@lovejs/cupidon-client");
 const WebSocket = require("ws");
-const md5File = require("md5-file");
-const md5 = require("md5");
 
 class Cupidon {
     constructor(build_path) {

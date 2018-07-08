@@ -20,7 +20,11 @@ class CupidonCompileCommand extends Command {
     }
 
     async build() {
-        await this.cupidon.build(true);
+        try {
+            await this.cupidon.build(true);
+        } catch (e) {
+            console.log(e);
+        }
         this.output("[success]Cupidon compiled.[/success]\n");
     }
 

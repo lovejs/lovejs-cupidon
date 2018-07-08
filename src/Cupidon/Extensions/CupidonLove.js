@@ -80,19 +80,48 @@ class CupidonLove extends CupidonExtension {
     getPlugins() {
         return _.orderBy(
             this.kernel.getPlugins().map(plugin => ({
-                name: plugin.name
+                name: plugin.name,
+                path: plugin.path
             })),
             "name"
         );
     }
 
-    async getData(query) {
-        return {
-            love: this.getLove(),
-            env: this.getEnv(),
-            services: this.getServices(),
-            plugins: this.getPlugins()
-        };
+    getLogger(name) {
+        const loggers = this.kernel.getLoggers();
+        if (!loggers[name]) {
+            throw new Error(`Logger with name ${name} not found`);
+        }
+
+        return loggers[name];
+    }
+
+    async getLogs(loggerName, start = 0, limit = 100, level = false) {
+        return new Promise((resolve, reject) => {
+            const logger = this.getLogger(loggerName);
+            if (!logger) {
+                return reject(`Logger not found ${loggerName}`);
+            }
+            logger.query({ start, limit, level }, (err, results) => {
+                console.log(results);
+                return err ? reject(err) : resolve(results.file);
+            });
+        });
+    }
+
+    async getData(query, { logger, start, limit }) {
+        switch (query) {
+            case "initial":
+                return {
+                    love: this.getLove(),
+                    env: this.getEnv(),
+                    services: this.getServices(),
+                    plugins: this.getPlugins(),
+                    loggers: _.keys(this.kernel.getLoggers())
+                };
+            case "logs":
+                return await this.getLogs(logger, start, limit);
+        }
     }
 }
 
