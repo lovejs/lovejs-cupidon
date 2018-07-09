@@ -103,7 +103,6 @@ class CupidonLove extends CupidonExtension {
                 return reject(`Logger not found ${loggerName}`);
             }
             logger.query({ start, limit, level }, (err, results) => {
-                console.log(results);
                 return err ? reject(err) : resolve(results.file);
             });
         });

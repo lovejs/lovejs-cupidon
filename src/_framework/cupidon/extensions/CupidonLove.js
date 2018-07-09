@@ -222,11 +222,11 @@ class LoveExtensionComponent extends React.Component {
         return serviceId.indexOf(search) != -1;
     };
 
-    getLogs = loggerIndex => {
+    getLogs = (loggerIndex, start = 0, limit = 100) => {
         const logger = this.state.data.loggers[loggerIndex];
-        return this.props.api("logs", { logger }).then(res => {
+        return this.props.api("logs", { logger, start, limit }).then(res => {
             if (res && res.data) {
-                this.setState({ logs: { [logger]: res.data } });
+                this.setState({ logs: { ...this.state.logs, [logger]: res.data } });
             }
         });
     };
@@ -306,7 +306,9 @@ class LoveExtensionComponent extends React.Component {
                         <Panel>
                             <SwipeableViews axis="x" index={logger} onChangeIndex={this.setLogger}>
                                 {loggers.map(logger => (
-                                    <div>{logs[logger] && <Logs openLog={this.openLog} logs={logs[logger]} classes={classes} />}</div>
+                                    <div key={logger}>
+                                        {logs[logger] && <Logs openLog={this.openLog} logs={logs[logger]} classes={classes} />}
+                                    </div>
                                 ))}
                             </SwipeableViews>
                         </Panel>
